@@ -253,7 +253,7 @@ function mergeConfigWithExternalRefer(
     ['connecttimeout', 'connTimeout'],
   ]);
 
-  section.config.forEach(line => {
+  section?.config.forEach(line => {
     if (!line.param) {
       return;
     }
