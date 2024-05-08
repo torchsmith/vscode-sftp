@@ -1,5 +1,6 @@
 import * as Client from 'ftp';
 import RemoteClient, { ConnectOption } from './remoteClient';
+import logger from '../../logger';
 
 // tslint:disable
 Client.prototype._send = function(cmd: string, cb: (err: Error) => void, promote: boolean) {
@@ -63,6 +64,8 @@ export default class FTPClient extends RemoteClient {
           reject(new Error('Timeout while connecting to server'));
         }
       }, connectTimeout);
+
+      logger.debug('[ftpClient]', option);
 
       this._client
         .on('ready', () => {

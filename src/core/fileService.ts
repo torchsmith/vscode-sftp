@@ -217,60 +217,60 @@ function mergeConfigWithExternalRefer(
     config.sshConfigPath || DEFAULT_SSHCONFIG_FILE
   );
 
-  const cache = app.fsCache;
+  // const cache = app.fsCache;
   let sshConfigContent;
-  if (cache.has(sshConfigPath)) {
-    sshConfigContent = cache.get(sshConfigPath);
-  } else {
+  // if (cache.has(sshConfigPath)) {
+  //   sshConfigContent = cache.get(sshConfigPath);
+  // } else {
     try {
       sshConfigContent = fs.readFileSync(sshConfigPath, 'utf8');
     } catch (error) {
       logger.warn(error.message, `load ${sshConfigPath} failed`);
       sshConfigContent = '';
     }
-    cache.set(sshConfigPath, sshConfigContent);
-  }
+  //   cache.set(sshConfigPath, sshConfigContent);
+  // }
 
   if (!sshConfigContent) {
     return copyed;
   }
 
-  const parsedSSHConfig = sshConfig.parse(sshConfigContent);
-  const section = parsedSSHConfig.find({
-    Host: copyed.host,
-  });
+  // const parsedSSHConfig = sshConfig.parse(sshConfigContent);
+  // const section = parsedSSHConfig.find({
+  //   Host: copyed.host,
+  // });
 
-  if (section === null) {
-    return copyed;
-  }
+  // if (section === null) {
+  //   return copyed;
+  // }
 
-  const mapping = new Map([
-    ['hostname', 'host'],
-    ['port', 'port'],
-    ['user', 'username'],
-    ['identityfile', 'privateKeyPath'],
-    ['serveraliveinterval', 'keepalive'],
-    ['connecttimeout', 'connTimeout'],
-  ]);
+  // const mapping = new Map([
+  //   ['hostname', 'host'],
+  //   ['port', 'port'],
+  //   ['user', 'username'],
+  //   ['identityfile', 'privateKeyPath'],
+  //   ['serveraliveinterval', 'keepalive'],
+  //   ['connecttimeout', 'connTimeout'],
+  // ]);
 
-  section.config.forEach(line => {
-    if (!line.param) {
-      return;
-    }
+  // section.config.forEach(line => {
+  //   if (!line.param) {
+  //     return;
+  //   }
 
-    const key = mapping.get(line.param.toLowerCase());
+  //   const key = mapping.get(line.param.toLowerCase());
 
-    if (key !== undefined) {
-      if (key === 'host') {
-        copyed[key] = line.value;
-      } else {
-        setConfigValue(copyed, key, line.value);
-      }
-    }
-  });
+  //   if (key !== undefined) {
+  //     if (key === 'host') {
+  //       copyed[key] = line.value;
+  //     } else {
+  //       setConfigValue(copyed, key, line.value);
+  //     }
+  //   }
+  // });
 
   // Bug introduced in pull request #69 : Fix ssh config resolution
-  /* const parsedSSHConfig = sshConfig.parse(sshConfigContent);
+  const parsedSSHConfig = sshConfig.parse(sshConfigContent);
   const computed = parsedSSHConfig.compute(copyed.host);
 
   const mapping = new Map([
@@ -279,6 +279,7 @@ function mergeConfigWithExternalRefer(
     ['user', 'username'],
     ['serveraliveinterval', 'keepalive'],
     ['connecttimeout', 'connTimeout'],
+    ['include', 'include'],
   ]);
 
   Object.entries<any>(computed).forEach(([param, value]) => {
@@ -297,7 +298,10 @@ function mergeConfigWithExternalRefer(
         setConfigValue(copyed, key, value);
       }
     }
-  }); */
+  });
+
+  logger.debug('[sshConfig]', copyed);
+  logger.debug('[sshConfigComputed]', computed);
 
   return copyed;
 }
@@ -547,6 +551,8 @@ export default class FileService {
       }
       throw new Error(errorMsg);
     }
+
+    logger.debug('[config]', completeConfig);
 
     return this._resolveServiceConfig(completeConfig);
   }

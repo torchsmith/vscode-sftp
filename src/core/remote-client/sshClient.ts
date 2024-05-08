@@ -296,6 +296,8 @@ export default class SSHClient extends RemoteClient {
         });
       }
 
+      logger.debug('[sshClient connect]', option);
+
       client
         .on('ready', resolve)
         .on('error', err => {
